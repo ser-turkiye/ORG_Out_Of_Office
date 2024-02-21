@@ -40,6 +40,8 @@ public class OutOfOfficeSch extends UnifiedAgent {
                     log.error("Task is locked.." + mainTask.getID() + "..restarting agent");
                     return resultRestart("Restarting Agent");
                 }
+
+                String dFromUserID = mainTask.getDescriptorValue("AbacOrgaRead");
                 String dlgStart = mainTask.getDescriptorValue("orgUserDelegationStart");
                 String dlgFinish = mainTask.getDescriptorValue("orgUserDelegationUntil");
                 String wbIsShared = mainTask.getDescriptorValue("orgUserDelegationExistingTask");
@@ -55,7 +57,8 @@ public class OutOfOfficeSch extends UnifiedAgent {
                 }
                 if(isEqualStart){
                     //if(prcs.contains("DISABLED")){continue;}
-                    IUser emplUser = getDocumentServer().getUserByLoginName(getSes(),processOwner.getLogin());
+                    //IUser emplUser = getDocumentServer().getUserByLoginName(getSes(),processOwner.getLogin());
+                    IUser emplUser = getDocumentServer().getUser(getSes(),(dFromUserID != null ? dFromUserID : processOwner.getLogin()));
                     if(emplUser == null)return resultError("UserName is NULL");
                     String userWBName = getWorkbasketIDfromUserID(emplUser.getID());
                     if (userWBName==null)return resultError("Workbasket Name is NULL");
@@ -79,13 +82,14 @@ public class OutOfOfficeSch extends UnifiedAgent {
                         }
                         userWBCopy.commit();
                         log.info("Delegated from:" + processOwner.getLogin() + " /// to:" + dUser.getLogin());
-                        mainTask.setDescriptorValue("orgUserDelegationFrom",processOwner.getLogin());
+                        //mainTask.setDescriptorValue("orgUserDelegationFrom",processOwner.getLogin());
                         mainTask.setDescriptorValue("orgProcessID", "DELEGATION-ENABLED-" + dtf.format(nowtime));
                         mainTask.commit();
                     }
                 }
                 if(isEqualFinish){
-                    IUser emplUser = getDocumentServer().getUserByLoginName(getSes(),processOwner.getLogin());
+                    //IUser emplUser = getDocumentServer().getUserByLoginName(getSes(),processOwner.getLogin());
+                    IUser emplUser = getDocumentServer().getUser(getSes(),(dFromUserID != null ? dFromUserID : processOwner.getLogin()));
                     if(emplUser == null)return resultError("UserName is NULL");
                     String userWBName = getWorkbasketIDfromUserID(emplUser.getID());
                     if (userWBName==null)return resultError("Workbasket Name is NULL");
@@ -102,7 +106,7 @@ public class OutOfOfficeSch extends UnifiedAgent {
                         }
                         userWBCopy.commit();
                         log.info("Delegation disabled from:" + processOwner.getLogin() + " /// to:" + dUser.getLogin());
-                        mainTask.setDescriptorValue("orgUserDelegationFrom",processOwner.getLogin());
+                        //mainTask.setDescriptorValue("orgUserDelegationFrom",processOwner.getLogin());
                         mainTask.setDescriptorValue("orgProcessID", "DELEGATION-DISABLED-" + dtf.format(nowtime));
                         mainTask.commit();
                     }
