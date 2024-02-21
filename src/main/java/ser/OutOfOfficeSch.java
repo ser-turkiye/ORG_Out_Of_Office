@@ -172,7 +172,7 @@ public class OutOfOfficeSch extends UnifiedAgent {
     private IInformationObject[] getDelegationTasks() throws Exception {
         StringBuilder builder = new StringBuilder();
         builder.append("TYPE = '").append(Conf.ClassIDs.OutOfOfficeProcess).append("'");
-        builder.append(" AND WFL_TASK_NAME = '").append(Conf.Tasks.OutOfOfficeProcessTask).append("'");
+        //builder.append(" AND WFL_TASK_NAME = '").append(Conf.Tasks.OutOfOfficeProcessTask).append("'");
                 //.append(" AND ").append("ORGPROCESSID").append("='NULL'");
         String whereClause = builder.toString();
         log.info("Where Clause: " + whereClause);
