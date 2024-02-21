@@ -52,7 +52,7 @@ public class OutOfOffice extends UnifiedAgent {
             if(dtStart.after(dtFinish) || dtStart.equals(dtFinish)){
                 log.info("Start Date ("+ dlgStart +") cannot be later than or equal Finish Date ("+ dlgFinish +") : " + mainTask.getID());
             }
-            if(!isEqualStart){
+            if(isEqualStart){
                 //if(prcs.contains("DISABLED")){continue;}
                 //IUser emplUser = getDocumentServer().getUserByLoginName(getSes(),(dFromUserID != null ? dFromUserID : processOwner.getLogin()));
                 IUser emplUser = getDocumentServer().getUser(getSes(),(dFromUserID != null ? dFromUserID : processOwner.getLogin()));
