@@ -1,6 +1,7 @@
 package ser;
 
 import com.ser.blueline.IInformationObject;
+import com.ser.blueline.IOrgaElement;
 import com.ser.blueline.IUser;
 import com.ser.blueline.bpm.*;
 import com.ser.blueline.metaDataComponents.IStringMatrix;
@@ -78,7 +79,15 @@ public class OutOfOfficeSch extends UnifiedAgent {
                         IReceivers receivers = getBpm().createReceivers(dUserWB);
                         userWBCopy.setActionOnAssignReceivers(receivers);
                         if(Objects.equals(wbIsShared, "true")){
-                            userWBCopy.addAccessibleBy(dUser);
+                            Object[] orgElmnt = userWBCopy.getAccessibleBy().toArray();
+                            Set<IOrgaElement> orgElmn2 = new HashSet<>();
+                            for(int i=0;i<orgElmnt.length;i++){
+                                orgElmn2.add((IOrgaElement) orgElmnt[i]);
+                            }
+                            IOrgaElement orgUser = (IOrgaElement) dUser;
+                            orgElmn2.add(orgUser);
+                            userWBCopy.setAccessibleBy(orgElmn2);
+                            ///userWBCopy.addAccessibleBy(dUser);//çalışmadı
                         }
                         userWBCopy.commit();
                         log.info("Delegated from:" + processOwner.getLogin() + " /// to:" + dUser.getLogin());
@@ -102,7 +111,21 @@ public class OutOfOfficeSch extends UnifiedAgent {
                         IUser dUser = getDocumentServer().getUserByLoginName(getSes(),dUserLogin);
                         IWorkbasket userWBCopy = userWB.getModifiableCopy(getSes());
                         if(Objects.equals(wbIsShared, "true")){
-                            userWBCopy.removeAccessibleBy(dUser);
+                            IOrgaElement orgUser = (IOrgaElement) dUser;
+                            Object[] orgElmnt = userWBCopy.getAccessibleBy().toArray();
+                            Set<IOrgaElement> orgElmn2 = new HashSet<>();
+                            for(int i=0;i<orgElmnt.length;i++){
+                                orgElmn2.add((IOrgaElement) orgElmnt[i]);
+                            }
+                            for(int i=0;i<orgElmnt.length;i++){
+                                String oID = orgUser.getID();
+                                String eID = ((IOrgaElement) orgElmnt[i]).getID();
+                                if(Objects.equals(oID,eID)){
+                                    orgElmn2.remove((IOrgaElement) orgElmnt[i]);
+                                }
+                            }
+                            userWBCopy.setAccessibleBy(orgElmn2);
+                            ///userWBCopy.removeAccessibleBy(dUser);///çalışmadı
                         }
                         userWBCopy.commit();
                         log.info("Delegation disabled from:" + processOwner.getLogin() + " /// to:" + dUser.getLogin());

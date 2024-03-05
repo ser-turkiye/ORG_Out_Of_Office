@@ -35,6 +35,7 @@ public class OutOfOffice extends UnifiedAgent {
                 log.error("Task is locked.." + mainTask.getID() + "..restarting agent");
                 return resultRestart("Restarting Agent");
             }
+            getBpm().reinitWorkbasketsCache();
             //String dFromUserWBID = mainTask.getDescriptorValue("AbacOrgaRead");
             //IWorkbasket dFromUserWB = getBpm().getWorkbasket(dFromUserWBID);
             //String dFromUserID = getUserIDfromWorkbasket(dFromUserWB.getID());
@@ -75,7 +76,14 @@ public class OutOfOffice extends UnifiedAgent {
                     IReceivers receivers = getBpm().createReceivers(dUserWB);
                     userWBCopy.setActionOnAssignReceivers(receivers);
                     if(Objects.equals(wbIsShared, "true")){
-                        userWBCopy.addAccessibleBy(dUser);
+                        Object[] orgElmnt = userWBCopy.getAccessibleBy().toArray();
+                        Set<IOrgaElement> orgElmn2 = new HashSet<>();
+                        for(int i=0;i<orgElmnt.length;i++){
+                            orgElmn2.add((IOrgaElement) orgElmnt[i]);
+                        }
+                        IOrgaElement orgUser = (IOrgaElement) dUser;
+                        orgElmn2.add(orgUser);
+                        userWBCopy.setAccessibleBy(orgElmn2);
                     }
                     userWBCopy.commit();
                     log.info("Delegated from:" + (dFromUserID != null ? dFromUserID : processOwner.getLogin()) + " /// to:" + dUser.getLogin());
@@ -91,7 +99,6 @@ public class OutOfOffice extends UnifiedAgent {
                 String userWBName = getWorkbasketIDfromUserID(emplUser.getID());
                 if (userWBName==null)return resultError("Workbasket Name is NULL");
                 IWorkbasket userWB = getBpm().getWorkbasketByName(userWBName);
-
                 String dUserWBID = mainTask.getDescriptorValue("orgUserDelegationTo");
                 if(dUserWBID != null){
                     IWorkbasket dUserWB = getBpm().getWorkbasket(dUserWBID);
@@ -99,7 +106,21 @@ public class OutOfOffice extends UnifiedAgent {
                     IUser dUser = getDocumentServer().getUserByLoginName(getSes(),dUserLogin);
                     IWorkbasket userWBCopy = userWB.getModifiableCopy(getSes());
                     if(Objects.equals(wbIsShared, "true")){
-                        userWBCopy.removeAccessibleBy(dUser);
+                        IOrgaElement orgUser = (IOrgaElement) dUser;
+                        Object[] orgElmnt = userWBCopy.getAccessibleBy().toArray();
+                        Set<IOrgaElement> orgElmn2 = new HashSet<>();
+                        for(int i=0;i<orgElmnt.length;i++){
+                            orgElmn2.add((IOrgaElement) orgElmnt[i]);
+                        }
+                        for(int i=0;i<orgElmnt.length;i++){
+                            String oID = orgUser.getID();
+                            String eID = ((IOrgaElement) orgElmnt[i]).getID();
+                            if(Objects.equals(oID,eID)){
+                                orgElmn2.remove((IOrgaElement) orgElmnt[i]);
+                            }
+                        }
+                        userWBCopy.setAccessibleBy(orgElmn2);
+                        ///userWBCopy.removeAccessibleBy(dUser);///çalışmadı
                     }
                     userWBCopy.commit();
                     log.info("Delegation disabled from:" + (dFromUserID != null ? dFromUserID : processOwner.getLogin()) + " /// to:" + dUser.getLogin());
