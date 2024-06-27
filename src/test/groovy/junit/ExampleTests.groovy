@@ -24,7 +24,7 @@ class ExampleTests {
 
         def agent = new OutOfOffice();
 
-        binding["AGENT_EVENT_OBJECT_CLIENT_ID"] = "ST0bBPM_SYS_ORG2428fed786-1795-4d88-a198-d0993a5924c6182023-12-07T08:58:24.901Z010"  //out-of-office
+        binding["AGENT_EVENT_OBJECT_CLIENT_ID"] = "ST0bBPM_SYS_ORG244acebbd3-02e2-4da8-9eab-ac935ff2a038182024-03-04T09:56:34.826Z010"  //out-of-office
 
         def result = (AgentExecutionResult)agent.execute(binding.variables)
         System.out.println(result)
